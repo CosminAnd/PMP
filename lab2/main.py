@@ -47,13 +47,32 @@ plt.show()
 #  A si B sunt  independente => p(A ^ B) = p(A) * p(B)
 # A = np.random.choice(a=['s', 'b'], p=[0.5, 0.5], size=1)
 # B = np.random.choice(a=['s', 'b'], p=[0.3, 0.7], size=1)
-# ss - 0, sb - 1, bs - 2, bb - 3
-chars = ['ss', 'sb', 'bs', 'bb']
-values = []
+ss = []
+sb = []
+bs = []
+bb = []
 for i in range(0, 100):
-    experiment = np.random.choice(a=[0, 1, 2, 3], p=[0.5 * 0.3, 0.5 * 0.7, 0.5 * 0.3, 0.5 * 0.7], size=10)
-    values.append(experiment)
-values = np.array(values)
+    rez = []
+    for i in range(0, 10):
+        A = np.random.choice(a=['s', 'b'], p=[0.5, 0.5], size=1)[0]
+        B = np.random.choice(a=['s', 'b'], p=[0.3, 0.7], size=1)[0]
+        match A, B:
+            case 's', 's':
+                rez.append('ss')
+            case 's', 'b':
+                rez.append('sb')
+            case 'b', 's':
+                rez.append('bs')
+            case 'b', 'b':
+                rez.append('bb')
+    ss.append(rez.count('ss'))
+    sb.append(rez.count('sb'))
+    bs.append(rez.count('bs'))
+    bb.append(rez.count('bb'))
 
-az.plot_posterior({'ss': values == 0, 'sb': values == 1, 'bs': values == 2, 'bb': values == 3})
+az.plot_posterior({"S, S": np.array(ss)})
+az.plot_posterior({"S, B": np.array(sb)})
+az.plot_posterior({"B, S": np.array(bs)})
+az.plot_posterior({"B, B": np.array(bb)})
 plt.show()
+
