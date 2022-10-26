@@ -1,18 +1,33 @@
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 import pymc3 as pm
 import arviz as az
 
-model = pm.Model()
-alpha = 3
+if __name__ == '__main__':
+    model = pm.Model()
+    with model:
+        alpha = 4.66  #aproximativ, aflat prin incercari; intre 4.6-4.9
+        clineti_pe_ora = pm.Poisson('clineti_pe_ora', alpha)
+        timp_asteptare = pm.Normal('timp_asteptare', mu=1, sigma=1 / 2)
+        comanda = pm.Exponential('comanda', 1 / alpha)
+        trace = pm.sample(100)
 
-with model:
-    rng = np.random.default_rng(12345)
-    rints = rng.integers(low=0, high= 20)
+    dictionary = {
+        'timp_preparare': trace['comanda'].tolist(),
+        'timp_asteptare': trace['timp_asteptare'].tolist(),
+    }
+    df = pd.DataFrame(dictionary)
 
-    traffic = pm.Poisson("T", mu=20)
-    for i in range(0, rints):
-        order = pm.Normal("O"+str(i), 1, sigma=0.5)
-        cook = pm.Exponential("C"+str(i), lam=alpha)
-    trace = pm.sample(10000, chains=1)
+    timp_asteptare15 = df[(df['timp_asteptare'] + df['timp_preparare'] <= 15)]
+    print("Timpul de asteptare <= 15:", timp_asteptare15.shape[0] / df.shape[0])
+
+    total = 0
+    #timpul de servire pentru un client este timpul asteptare + timpul de preparare
+    for tup in zip(df['timp_asteptare'], df['timp_preparare']):
+        total += tup[0] + tup[1]
+
+    print("Timpul mediu de asteptare:", total / df.shape[0])
+
+
+    az.plot_posterior({"Clienti pe ora": trace['clineti_pe_ora'], "Timp de asteptare": trace['timp_asteptare'], "Medie comenzi": trace['comanda']})
+    plt.show()
