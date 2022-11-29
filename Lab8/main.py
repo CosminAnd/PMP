@@ -25,10 +25,10 @@ def main():
         idata_1 = pm.sample(2000, target_accept=0.9, return_inferencedata=True)
 
     # granita de decizie
-    sort_idx = np.argsort(x1_ax[:, 0])
-    bd = idata_1.posterior['bd'].mean(("chain", "draw"))[sort_idx]
+    sorted_idx = np.argsort(x1_ax[:, 0])
+    bd = idata_1.posterior['bd'].mean(("chain", "draw"))[sorted_idx]
     plt.scatter(x1_ax[:, 0], x1_ax[:, 1], c=[f'C{x}' for x in y1])
-    plt.plot(x1_ax[:, 0][sort_idx], bd, color='k')
+    plt.plot(x1_ax[:, 0][sorted_idx], bd, color='k')
 
     # grafica
     az.plot_hdi(x1_ax[:, 0], idata_1.posterior['bd'], color='k')
