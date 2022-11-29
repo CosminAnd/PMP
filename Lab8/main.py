@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import arviz as az
 
 
-def main():
+if __name__ == '__main__':
     data = pd.read_csv('Admission.csv')
     df = data
     y1 = pd.Categorical(df['Admission']).codes
@@ -35,6 +35,3 @@ def main():
     plt.xlabel(x_n[0])
     plt.ylabel(x_n[1])
 
-
-if __name__ == '__main__':
-    main()
